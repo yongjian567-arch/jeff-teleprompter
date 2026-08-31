@@ -1,0 +1,5 @@
+# 依赖目录(运行 npm install 即可重新生成)
+node_modules/
+
+# 打包产物(运行 npm run dist 即可重新生成)
+release/

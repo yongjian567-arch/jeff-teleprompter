@@ -1,0 +1,46 @@
+{
+  "name": "jeff-teleprompter",
+  "version": "1.0.0",
+  "description": "Jeff 提词器 — Windows 桌面提词器",
+  "main": "main.js",
+  "author": "Jeff",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win"
+  },
+  "dependencies": {
+    "iconv-lite": "^0.6.3",
+    "mammoth": "^1.8.0"
+  },
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.jeff.teleprompter",
+    "productName": "Jeff提词器",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "shortcutName": "Jeff提词器"
+    }
+  }
+}
