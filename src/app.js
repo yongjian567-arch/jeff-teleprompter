@@ -11,6 +11,7 @@ const btnOpen = document.getElementById('btn-open');
 const btnPlus = document.getElementById('btn-plus');
 const btnMinus = document.getElementById('btn-minus');
 const btnFull = document.getElementById('btn-full');
+const btnExit = document.getElementById('btn-exit');
 
 const SLOT = 112;        // 每句占用的固定高度(px)
 const BASE_FONT = 40;    // 居中句的最大字号(px)
@@ -114,7 +115,7 @@ function setSpeed(v) {
 function showScript(res) {
   segments = res.segments || [];
   if (!segments.length) {
-    alert('没有读取到文字,请确认文件是 .txt 或 .docx 格式');
+    alert('没有读取到文字,请确认文件格式正确(.txt / .md / .docx / .doc / .rtf)');
     return;
   }
   renderSegments();
@@ -123,7 +124,23 @@ function showScript(res) {
   lastTs = 0;
   dropzone.style.display = 'none';
   track.style.display = 'block';
+  btnExit.style.display = 'block';
   applyScroll();
+}
+
+// 退出提词模式,回到选文件界面
+function exitScript() {
+  segments = [];
+  playing = false;
+  offset = 0;
+  maxOffset = 0;
+  centerY = [];
+  currentIdx = 0;
+  lastTs = 0;
+  track.innerHTML = '';
+  track.style.display = 'none';
+  btnExit.style.display = 'none';
+  dropzone.style.display = 'flex';
 }
 
 async function loadFile(name, buf) {
@@ -154,6 +171,7 @@ btnOpen.onclick = async () => {
 btnPlus.onclick = () => setSpeed(speed + 10);
 btnMinus.onclick = () => setSpeed(speed - 10);
 btnFull.onclick = () => api.toggleFullscreen();
+btnExit.onclick = exitScript;
 
 // 键盘控制
 window.addEventListener('keydown', (e) => {

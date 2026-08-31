@@ -101,6 +101,14 @@ html, body {
 /* 顶部按钮 */
 #topbar { position: absolute; top: 14px; right: 20px; }
 
+/* 左上角退出按钮(加载文案后才显示) */
+#btn-exit {
+  position: absolute;
+  top: 14px;
+  left: 20px;
+  display: none;
+}
+
 /* 底部提示 */
 #hint {
   position: absolute;

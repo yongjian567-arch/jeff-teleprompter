@@ -7,7 +7,8 @@
   "license": "MIT",
   "scripts": {
     "start": "electron .",
-    "dist": "electron-builder --win"
+    "dist": "electron-builder --win",
+    "test": "jest"
   },
   "dependencies": {
     "iconv-lite": "^0.6.3",
@@ -16,7 +17,9 @@
   },
   "devDependencies": {
     "electron": "^33.2.0",
-    "electron-builder": "^25.1.8"
+    "electron-builder": "^25.1.8",
+    "jest": "^30.5.0",
+    "jest-environment-jsdom": "^30.5.0"
   },
   "build": {
     "appId": "com.jeff.teleprompter",
