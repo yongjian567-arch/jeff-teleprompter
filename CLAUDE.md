@@ -15,13 +15,13 @@ Windows 桌面提词器,帮助口播/视频创作者在录制时流畅读稿。
 ## 技术栈(用户已选定)
 
 - Electron(界面用 HTML/CSS/JS)
-- DOCX 解析:mammoth
+- 文档解析:mammoth(.docx)、word-extractor(.doc)、自研(.rtf)
 - TXT 编码:兼容 UTF-8 + GBK(iconv-lite)
 - 打包:electron-builder(生成 Windows .exe)
 
 ## 关键实现约束
 
-- 支持格式:TXT + Word(.docx);本期不做 PDF / Markdown
+- 支持格式:TXT、Markdown、Word(.docx/.doc)、富文本(.rtf);本期不做 PDF
 - 黑底白字,向上滚动
 - 当前句居中、字号最大(纯白);下一句由浅变深、随滚动放大并居中停留;已读句上移变暗
 - 右侧 +/− 调速度,默认 250 字/分钟(范围 80–500,步进 10)

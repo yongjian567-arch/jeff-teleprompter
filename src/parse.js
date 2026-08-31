@@ -1,6 +1,7 @@
-// 文案解析:支持 .txt(UTF-8 / GBK)与 .docx(mammoth)
+// 文案解析:支持 .txt(UTF-8/GBK)、.md、.docx(mammoth)、.doc(word-extractor)、.rtf
 const mammoth = require('mammoth');
 const iconv = require('iconv-lite');
+const WordExtractor = require('word-extractor');
 
 const MAX_CHARS = 24; // 每句最多字数,保证一行内显示
 
@@ -68,16 +69,63 @@ function splitSegments(text) {
   return out;
 }
 
+// 解析 .doc(老版 Word):word-extractor 直接吃 Buffer,无需临时文件
+async function parseDoc(buffer) {
+  const doc = await new WordExtractor().extract(buffer);
+  return (doc && doc.getBody && doc.getBody()) || '';
+}
+
+// 解析 .rtf(富文本):剥离控制字,还原中文
+function parseRtf(buffer) {
+  let s = buffer.toString('latin1');
+  s = stripRtfHeader(s);
+  // \uN 还原 Unicode(吃掉后面一个后备字符,常见为 ? 或空格)
+  s = s.replace(/\\u(-?\d+)./g, (_m, n) => {
+    const c = parseInt(n, 10);
+    return c > 0 ? String.fromCharCode(c) : '';
+  });
+  // \'hh 还原单字节
+  s = s.replace(/\\'([0-9a-fA-F]{2})/g, (_m, h) => String.fromCharCode(parseInt(h, 16)));
+  // 换行 / 制表
+  s = s.replace(/\\par\b/g, '\n').replace(/\\line\b/g, '\n').replace(/\\tab\b/g, ' ');
+  // 去掉剩余控制字
+  s = s.replace(/\\[a-zA-Z]+-?\d*\s?/g, '');
+  // 去掉花括号
+  s = s.replace(/[{}]/g, '');
+  return s;
+}
+
+// 跳过 RTF 表头里的分组(fonttbl / colortbl / stylesheet / info 等),按括号深度匹配
+function stripRtfHeader(s) {
+  const keys = ['fonttbl', 'colortbl', 'stylesheet', 'info', 'pict', 'object', 'header', 'footer'];
+  for (const key of keys) {
+    const m = new RegExp('\\\\' + key + '\\b').exec(s);
+    if (!m) continue;
+    const open = s.lastIndexOf('{', m.index);
+    if (open < 0) continue;
+    let depth = 0;
+    for (let i = open; i < s.length; i++) {
+      if (s[i] === '{') depth++;
+      else if (s[i] === '}') { depth--; if (depth <= 0) { s = s.slice(0, open) + s.slice(i + 1); break; } }
+    }
+  }
+  return s;
+}
+
 async function parseFileBuffer(name, buffer) {
   const lower = (name || '').toLowerCase();
   let text = '';
   if (lower.endsWith('.docx')) {
     const result = await mammoth.extractRawText({ buffer });
     text = result.value || '';
+  } else if (lower.endsWith('.doc')) {
+    text = await parseDoc(buffer);
+  } else if (lower.endsWith('.rtf')) {
+    text = parseRtf(buffer);
   } else if (lower.endsWith('.txt') || lower.endsWith('.md')) {
     text = decodeText(buffer);
   } else {
-    throw new Error('暂不支持该格式(' + (name || '未知') + '),请使用 .txt 或 .docx 文件');
+    throw new Error('暂不支持该格式(' + (name || '未知') + ')。支持:.txt / .md / .docx / .doc / .rtf');
   }
   return { name, text, segments: splitSegments(text) };
 }

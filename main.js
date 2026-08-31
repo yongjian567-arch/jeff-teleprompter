@@ -53,9 +53,10 @@ ipcMain.handle('open-dialog', async () => {
     const res = await dialog.showOpenDialog(win, {
       title: '打开文案',
       filters: [
-        { name: '支持的文案', extensions: ['txt', 'docx'] },
-        { name: '文本文件', extensions: ['txt'] },
-        { name: 'Word 文档', extensions: ['docx'] },
+        { name: '所有支持的文案', extensions: ['txt', 'md', 'docx', 'doc', 'rtf'] },
+        { name: 'Word 文档', extensions: ['docx', 'doc'] },
+        { name: '文本文件', extensions: ['txt', 'md'] },
+        { name: '富文本', extensions: ['rtf'] },
       ],
       properties: ['openFile'],
     });
